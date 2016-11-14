@@ -1,29 +1,13 @@
-// Meatest_M602.cpp : 定义 DLL 应用程序的导出函数。
-//
+// Meatest_M602.cpp : 定义 DLL 对应的Meatest_M602类的各个成员函数。
 
 #include "stdafx.h"
-/*extern "C" _declspec(dllexport) int Max(int a, int b);
-extern "C" _declspec(dllexport) int Min(int a, int b);
-int Max(int a, int b)
-{
-	if (a >= b)return a;
-	else
-		return b;
-}
-int Min(int a, int b)
-{
-	if (a >= b)return b;
-	else
-		return a;
-}*/
-//this is the head file of the Meatest_M602
-#pragma once
+#include "Meatest_M602.h"
+#include <iostream>
+#include <Windows.h>
+#include <string>
+using namespace std;
 
-#include "idevice.h"
-#include "visa.h"
-#include "visatype.h"
-
-
+//this is the member fucntions of the Meatest_M602。
 #define SUCCESS 					0L
 #define WRONGCOMMAND				1L
 #define FAILINOPERATION				2L
@@ -54,12 +38,64 @@ static ViSession instr_re;
 
 class Meatest_M602 : public iDevice {
 public:
-	Meatest_M602(char * devAdress, bool beSimulate = false);
+	Meatest_M602(char * devAdress, bool beSimulate = false){
+		bSimulate = beSimulate;
+		session = NULL;
+		status = SUCCESS;
+		Separator = NULL;
+		modueAddr = 0x0002;
+		memset(errorMsg, 0, sizeof(errorMsg));
+		memset(seperateStr, 0, sizeof(seperateStr));
+		memset(Result, 0, sizeof(Result));
+		memset(address, 0, sizeof(address));
+		//the inital of the device
+		strcpy_s(address, devAdress);
+		//if this the simulate module,it just return the result.
+		if (beSimulate){
+			status = SUCCESS;
+			strcpy_s(errorMsg, EMULATION_OK);
+			strcpy_s(Result, EMULATION_OK);
+			return;
+		}
+		//use the functions of the VISA to initial the device 
+		vistatus = viOpenDefaultRM(&defaultRM);
+		if (VI_SUCCESS > vistatus){
+			status = INITIALFALED;
+			strcpy_s(errorMsg, "Can't open a session to the VISA Resource Manager");
+			return;
+		}
+		vistatus = viOpen(defaultRM, address, VI_NULL, VI_NULL, &instr);
+		if (VI_SUCCESS > vistatus){
+			status = INITIALFALED;
+			strcpy_s(errorMsg, "Cannot open a session to the 8432_PORT2");
+		}
+		status = SUCCESS;
+		strcpy_s(errorMsg, EXECUTE_OK);
+		return;
+	};
 
-	~Meatest_M602(void);
+	~Meatest_M602(void){
+		if (bSimulate){
+			status = SUCCESS;
+			strcpy_s(errorMsg, EMULATION_OK);
+			strcpy_s(Result, EMULATION_OK);
+		}
+		vistatus = viClose(instr);
+	};
 
 	//explain and execute the command
-	virtual char * ExecuteCmd(char * commandLine);
+	virtual char * ExecuteCmd(char * commandLine){
+		if (1024 <= strlen(commandLine)){
+			status = WRONGCOMMAND;
+			strcpy_s(errorMsg, ERROR_FAIL_OPERATION);
+			memset(Result, 0, sizeof(Result));
+			return Result;
+		}
+		memset(Result, 0, sizeof(Result));
+		bool bFindSeperate = SeperateCommand(commandLine);
+		if (bFindSeperate) cmdLine = Seperator + 1;
+
+	};
 
 	//return the status of last execute
 	virtual long GetLastErrorCode() {
@@ -93,9 +129,10 @@ protected:
 	char * Separator;
 	char address[100];
 	unsigned char modueAddr;
+	char Result[Meatest_M602_MAXLENGTH];//return the result
 
 
 };
 
-extern "C" _declspec(dllexport) Meatest_M602 * createDevice(char * devAdress, bool beSimulate = false);
+//extern "C" _declspec(dllexport) Meatest_M602 * createDevice(char * devAdress, bool beSimulate = false);
 
