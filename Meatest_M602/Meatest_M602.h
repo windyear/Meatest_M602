@@ -92,7 +92,7 @@ protected:
 	long status;			//表示状态
 	char errorMsg[1024];	//错误信息
 	char seperateStr[1024]; //保存截取的字符串
-	char * Separator;		//分隔符位置指示
+	char * Seperator;		//分隔符位置指示
 	char address[100];		//NI串口板卡的地址
 	unsigned char modueAddr;//电阻箱模块的地址
 	char Result[Meatest_M602_MAXLENGTH];//return the result
