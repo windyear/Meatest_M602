@@ -85,6 +85,7 @@ protected:
 	void SetModuleAdress(char * commandLine);		//设置模块的地址
 	void GetResistanceValue();						//获取电阻箱的电阻值
 	void SetResistanceValue(char * commandLine);	//设置电阻箱的电阻值
+	void SetOutput(char * commandLine);								//设置电阻箱的开关
 
 
 	bool bSimulate;			//用于指示使用哪种模式

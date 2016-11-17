@@ -8,7 +8,7 @@
 using namespace std;
 
 //this is the member fucntions of the Meatest_M602。
-Meatest_M602::Meatest_M602(char * devAdress, bool beSimulate = false){
+Meatest_M602::Meatest_M602(char * devAdress, bool beSimulate){
 		bSimulate = beSimulate;
 		session = NULL;
 		status = SUCCESS;
@@ -80,6 +80,7 @@ char * Meatest_M602::ExecuteCmd(char * commandLine){
 
 bool Meatest_M602::SeperateCommand(char * commandLine){
 		memset(seperateStr, 0, sizeof(seperateStr));
+		//逗号作为分隔符
 		Seperator = strchr(commandLine, ',');
 		if (Seperator == NULL){
 			strcpy_s(seperateStr, commandLine);
@@ -94,5 +95,48 @@ bool Meatest_M602::SeperateCommand(char * commandLine){
 
 	void Reset();
 	void SetModuleAdress(char * commandLine);
-	void GetResistanceValue();
-	void SetResistanceValue(char * commandLine);
+void Meatest_M602::GetResistanceValue(){
+	//一些符号的ASCII：','0x2c
+	unsigned char cmdTag1 = 0x2c;		//用于表示控制指令的开始
+	unsigned char cmdTag2 = 0x2c;		//用于表示控制指令的开始
+	unsigned char setValue = 0x41;		//use to represent set value
+	unsigned char endCode = 0x0d;       //end the command
+	unsigned char query = 0x3f;			//问号的acsii码代表询问电阻值
+	unsigned char sendData[] = { cmdTag1, cmdTag2, setValue, query, endCode };
+
+	vistatus = viWrite(instr, (ViBuf)sendData, (ViUInt32)5, &writeCount);
+	if (VI_SUCCESS > vistatus){
+		status = vistatus;
+		strcpy_s(errorMsg, "Error writing to the device");
+		return;
+	}
+	//下面获取读取出来的数据，都是字符串的格式。
+
+	}
+void Meatest_M602::SetResistanceValue(char * commandLine){
+	//一些符号的ASCII：','0x2c
+	unsigned char cmdTag1 = 0x2c;		//用于表示控制指令的开始
+	unsigned char cmdTag2 = 0x2c;		//用于表示控制指令的开始
+	unsigned char setValue = 0x41;		//use to represent set value
+	unsigned char endCode = 0x0d;       //end the command
+	
+
+	//获取指令中所要设置的值的长度
+	int lengthOfvommandLine = strlen(commandLine);
+	
+	unsigned char sendData[] = { cmdTag1, cmdTag2, setValue };
+
+
+}
+void Meatest_M602::SetOutput(char * commandLine){
+
+}
+void Meatest_M602::Reset(){
+
+}
+void Meatest_M602::SetModuleAdress(char * commandLine){
+
+}
+Meatest_M602* createDevice(char * devAdress, bool beSimulate){
+	return new Meatest_M602(devAdress, beSimulate);
+}
