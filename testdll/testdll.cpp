@@ -2,6 +2,7 @@
 #pragma comment(lib,"Meatest_M602.lib")
 extern "C" _declspec(dllimport) int Max(int a, int b);
 extern "C" _declspec(dllimport) int Min(int a, int b);
+//extern "C" _declspec(dllimport) Meatest_M602 * createDevice(char * devAdress, bool beSimulate = false);
 #include "stdafx.h"
 #include <iostream>
 

@@ -44,8 +44,9 @@ return a;
 #define Meatest_M602_RESET						"Reset"
 #define Meatest_M602_SETRESISTANCEVALUE			"SetResistanceValue"
 #define Meatest_M602_GETRESISTANCEVALUE			"GetResistanceValue"
-#define Meatest_M602_SETMODULEADDRESS			"SetModuleAdress"
+#define Meatest_M602_SETMODULEADDRESS			"SetModuleAddress"
 //} End Operation{
+#define FRAME_LENGTH 100
 static ViSession defaultRM;
 static ViUInt32 retCount;
 static ViUInt32 writeCount;
@@ -81,21 +82,21 @@ public:
 protected:
 	bool SeperateCommand(char * commandLine);		//分割命令
 
-	void Reset();									//重置
-	void SetModuleAdress(char * commandLine);		//设置模块的地址
+	void Reset();									//重置，设置电阻箱的模式为电阻模式，电阻值为100欧姆
+	void SetModuleAddress(char * commandLine);		//设置模块的地址
 	void GetResistanceValue();						//获取电阻箱的电阻值
 	void SetResistanceValue(char * commandLine);	//设置电阻箱的电阻值
-	void SetOutput(char * commandLine);								//设置电阻箱的开关
+	void SetOutput(char * commandLine);								//设置电阻箱的开关，这个函数只能在不是提供外部电源的时候使用，暂时不实现
 
 
 	bool bSimulate;			//用于指示使用哪种模式
-	void * session;			//会话句柄
+	//void * session;			//会话句柄
 	long status;			//表示状态
 	char errorMsg[1024];	//错误信息
 	char seperateStr[1024]; //保存截取的字符串
 	char * Seperator;		//分隔符位置指示
 	char address[100];		//NI串口板卡的地址
-	unsigned char modueAddr;//电阻箱模块的地址
+	unsigned char moduleAddr;//电阻箱模块的地址
 	char Result[Meatest_M602_MAXLENGTH];//return the result
 
 
